@@ -3,7 +3,7 @@
 #https://github.com/hectorsvill/Computer-Architecture/blob/master/LS8-spec.md
 
 import sys
-
+#opcodes
 LDI = 0X82 # 130
 PRN = 0X47  # 71
 HLT = 0X01 # 1
@@ -13,6 +13,10 @@ POP = 0X46 #70
 CALL = 0X50# 80
 RET = 0X11 #17
 ADD = 0XA0 # 160
+CMP = 0XA7 # 167
+
+
+
 
 SP = 0XF4 # empty stack address
 
@@ -29,6 +33,7 @@ class CPU:
         self.reg_b = 0 # Memory Data Register, holds the value to write or the value just read
         self.ir = 0 # Instruction Register, contains a copy of the currently executing instruction
         self.reg[7] = SP # stack pointer - at address F4, if the stack is empty
+        self.fl = 0b00000000 # FL bits: 00000LGE
     def create_dispatch_table(self):
         '''
         Create a dispatch table for faster access
@@ -42,7 +47,9 @@ class CPU:
             POP: self.pop,
             CALL: self.call,
             RET: self.ret,
-            ADD: self.add
+            ADD: self.add,
+            CMP: self.cmpr,
+
         }
         return dispatch_table
     def load(self):
@@ -68,6 +75,13 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
+        elif op == "CMP":
+            if self.reg[reg_a] == self.reg[reg_b]:
+                self.fl = 0b00000001
+            elif self.reg[reg_a] > self.reg[reg_b]:
+                self.fl = 0b00000010
+            elif self.reg[reg_a] < self.reg[reg_b]:
+                self.fl = 0b00000100
         else:
             raise Exception("Unsupported ALU operation")
     def trace(self):
@@ -173,6 +187,15 @@ class CPU:
     def add(self):
         self.alu("ADD", self.reg_a, self.reg_b)
         self.pc += 3 
+    def cmpr(self):
+        '''
+        Compare the values in two registers.
+        If they are equal, set the Equal E flag to 1, otherwise set it to 0.
+        If registerA is less than registerB, set the Less-than L flag to 1, otherwise set it to 0.
+        If registerA is greater than registerB, set the Greater-than G flag to 1, otherwise set it to 0.
+        '''
+        self.alu("CMP",self.reg_a, self.reg_b)
+        self.pc += 3
     def run(self):
         '''
         run cpu
@@ -184,7 +207,7 @@ class CPU:
             if self.ir in self.dispatch_table:
                 self.dispatch_table[self.ir]()
             else:
-                raise Exception(f"error: did not find instruction in dispatch_table ---> {self.ir}")
+                raise Exception(f"did not find instruction in dispatch_table ---> {self.ir}")
 if __name__ == "__main__":
     cpu = CPU()
     cpu.load()
