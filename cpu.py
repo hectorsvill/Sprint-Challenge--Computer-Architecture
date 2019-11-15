@@ -4,19 +4,19 @@
 
 import sys
 #opcodes
-LDI = 0X82 # 130
+LDI = 0X82  # 130
 PRN = 0X47  # 71
-HLT = 0X01 # 1
-MUL = 0XA2 # 162 
+HLT = 0X01  # 1
+MUL = 0XA2  # 162 
 PUSH = 0X45 # 69
 POP = 0X46  # 70
 CALL = 0X50 # 80
 RET = 0X11  # 17
 ADD = 0XA0  # 160
 CMP = 0XA7  # 167
-JMP = 0X55  # 85
-
-
+JMP = 0X54  # 85
+JEQ = 0X55  # 86
+JNE = 0X56  # 86
 
 SP = 0XF4 # empty stack address
 
@@ -50,8 +50,8 @@ class CPU:
             ADD: self.add,
             CMP: self.cmpr,
             JMP: self.jmp,
-
-
+            JEQ: self.jeq,
+            JNE: self.jne,
         }
         return dispatch_table
     def load(self):
@@ -205,9 +205,21 @@ class CPU:
         '''
         self.pc = self.reg[self.reg_a]
     def jeq(self):
-        pass
+        '''
+        If equal flag is set (true), jump to the address stored in the given register.
+        '''
+        if self.fl == 1:
+            self.jmp()
+        else:
+            self.pc += 2
     def jne(self):
-        pass
+        '''
+        If E flag is clear (false, 0), jump to the address stored in the given register.
+        '''
+        if self.fl != 0:
+            self.jmp()
+        else:
+            self.pc += 2
     def run(self):
         '''
         run cpu
