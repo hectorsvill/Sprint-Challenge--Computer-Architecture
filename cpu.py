@@ -73,7 +73,6 @@ class CPU:
                     address += 1
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
-
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
@@ -82,7 +81,7 @@ class CPU:
                 self.fl = 0b00000001
             elif self.reg[reg_a] > self.reg[reg_b]:
                 self.fl = 0b00000010
-            elif self.reg[reg_a] < self.reg[reg_b]:
+            elif self.reg[reg_a] > self.reg[reg_b]:
                 self.fl = 0b00000100
         else:
             raise Exception("Unsupported ALU operation")
@@ -208,7 +207,7 @@ class CPU:
         '''
         If equal flag is set (true), jump to the address stored in the given register.
         '''
-        if self.fl == 1:
+        if self.fl == 0b00000001:
             self.jmp()
         else:
             self.pc += 2
@@ -216,7 +215,7 @@ class CPU:
         '''
         If E flag is clear (false, 0), jump to the address stored in the given register.
         '''
-        if self.fl != 0:
+        if self.fl == 0b00000000:
             self.jmp()
         else:
             self.pc += 2
