@@ -9,12 +9,12 @@ PRN = 0X47  # 71
 HLT = 0X01 # 1
 MUL = 0XA2 # 162 
 PUSH = 0X45 # 69
-POP = 0X46 #70
-CALL = 0X50# 80
-RET = 0X11 #17
-ADD = 0XA0 # 160
-CMP = 0XA7 # 167
-
+POP = 0X46  # 70
+CALL = 0X50 # 80
+RET = 0X11  # 17
+ADD = 0XA0  # 160
+CMP = 0XA7  # 167
+JMP = 0X55  # 85
 
 
 
@@ -49,6 +49,8 @@ class CPU:
             RET: self.ret,
             ADD: self.add,
             CMP: self.cmpr,
+            JMP: self.jmp,
+
 
         }
         return dispatch_table
@@ -196,6 +198,16 @@ class CPU:
         '''
         self.alu("CMP",self.reg_a, self.reg_b)
         self.pc += 3
+    def jmp(self):
+        '''
+        Jump to the address stored in the given register.
+        Set the PC to the address stored in the given register.
+        '''
+        self.pc = self.reg[self.reg_a]
+    def jeq(self):
+        pass
+    def jne(self):
+        pass
     def run(self):
         '''
         run cpu
