@@ -17,6 +17,8 @@ CMP = 0XA7  # 167
 JMP = 0X54  # 85
 JEQ = 0X55  # 86
 JNE = 0X56  # 86
+PRA = 0X48 # 72
+AND = 0XA8
 
 SP = 0XF4 # empty stack address
 
@@ -52,6 +54,8 @@ class CPU:
             JMP: self.jmp,
             JEQ: self.jeq,
             JNE: self.jne,
+            PRA: self.pra,
+            AND: self.and_op,
         }
         return dispatch_table
     def load(self):
@@ -226,11 +230,22 @@ class CPU:
         while not self.halted:
             self.ir = self.ram_read(self.pc)
             self.register()
-            # print(self.ir)
+            print(self.ir)
             if self.ir in self.dispatch_table:
                 self.dispatch_table[self.ir]()
             else:
                 raise Exception(f"did not find instruction in dispatch_table ---> {self.ir}")
+    def pra(self):
+        '''
+        Print alpha character value stored in the given register.
+        Print to the console the ASCII character corresponding to the value in the register.
+        '''
+        value = self.reg[self.reg_a]
+        print(chr(value), end="")
+        self.pc += 2
+    def and_op(self):
+        self.alu("AND", self.reg_a, self.reg_b)
+
 if __name__ == "__main__":
     cpu = CPU()
     cpu.load()
